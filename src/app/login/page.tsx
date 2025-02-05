@@ -21,11 +21,30 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const { email, password } = e.target as HTMLFormElement;
+
     setIsLoading(true);
-    // Simulate login delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push('/play');
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value,
+      }),
+    });
     setIsLoading(false);
+
+    if (response.ok) {
+      const { role } = await response.json();
+      if (role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/play');
+      }
+    }
   };
 
   return (
