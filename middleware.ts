@@ -1,16 +1,32 @@
-import type { NextRequest } from 'next/server';
-import { isAuthenticated } from '@/lib/auth';
+import auth from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server';
 
-// Limit the middleware to paths starting with `/api/`
-export const config = {
-  matcher: '/api/:function*',
-};
+const protectedRoutes = ['/dashboard'];
+const publicRoutes = ['/login', '/signup'];
 
-export function middleware(request: NextRequest) {
-  if (!isAuthenticated(request)) {
-    return Response.json(
-      { success: false, message: 'authentication failed' },
-      { status: 401 }
-    );
+export default async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+  const isProtectedRoute = protectedRoutes.includes(path);
+  const isPublicRoute = publicRoutes.includes(path);
+
+  const isAuthenticated = await auth.isAuthenticated(req);
+
+  if (isProtectedRoute && !isAuthenticated) {
+    return NextResponse.redirect(new URL('/login', req.nextUrl));
   }
+
+  if (
+    isPublicRoute &&
+    isAuthenticated &&
+    !req.nextUrl.pathname.startsWith('/dashboard')
+  ) {
+    return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
+  }
+
+  return NextResponse.next();
 }
+
+// Routes Middleware should not run on
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+};
