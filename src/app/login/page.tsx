@@ -39,6 +39,7 @@ export default function LoginPage() {
 
     if (response.ok) {
       const { role } = await response.json();
+
       if (role === 'admin') {
         router.push('/admin');
       } else {
@@ -78,7 +79,7 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 placeholder="example@email.com"
                 required
                 className="rounded-xl border-2 border-gray-200 focus:border-purple-500 transition-colors"
