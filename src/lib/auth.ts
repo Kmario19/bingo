@@ -1,9 +1,10 @@
 import 'server-only';
 import jwt from 'jsonwebtoken';
-import type { NextRequest } from 'next/server';
 
-const isAuthenticated = (request: NextRequest) => {
-  const [, token] = request.headers.get('authorization')?.split(' ') || [];
+import cookies from '@/lib/cookies';
+
+const isAuthenticated = async () => {
+  const token = await cookies.get('token');
 
   if (!token) {
     return false;

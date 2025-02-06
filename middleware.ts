@@ -9,7 +9,7 @@ export default async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.includes(path);
   const isPublicRoute = publicRoutes.includes(path);
 
-  const isAuthenticated = await auth.isAuthenticated(req);
+  const isAuthenticated = await auth.isAuthenticated();
 
   if (isProtectedRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));
