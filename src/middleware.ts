@@ -1,7 +1,7 @@
 import auth from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedRoutes = ['/dashboard'];
+const protectedRoutes = ['/dashboard', '/play'];
 const publicRoutes = ['/login', '/signup'];
 
 export default async function middleware(req: NextRequest) {
@@ -10,6 +10,8 @@ export default async function middleware(req: NextRequest) {
   const isPublicRoute = publicRoutes.includes(path);
 
   const isAuthenticated = await auth.isAuthenticated();
+
+  console.log('Testing middleware', path, isAuthenticated);
 
   if (isProtectedRoute && !isAuthenticated) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));
@@ -26,7 +28,7 @@ export default async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// Routes Middleware should not run on
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher:
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
 };
