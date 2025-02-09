@@ -1,6 +1,10 @@
-import jwt from 'jsonwebtoken';
+import * as jose from 'jose';
 
 import cookies from '@/lib/cookies';
+
+const jwtConfig = {
+  secret: new TextEncoder().encode(process.env.JWT_SECRET),
+};
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
@@ -14,11 +18,13 @@ export async function POST(request: Request) {
     role = 'admin';
   }
 
-  const token = jwt.sign({ role }, process.env.JWT_SECRET!, {
-    expiresIn: '7d',
-  });
+  const token = await new jose.SignJWT()
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(jwtConfig.secret);
 
-  cookies.set('token', token, Date.now() + 7 * 24 * 60 * 60 * 1000);
+  await cookies.set('token', token, Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   return Response.json({
     token,

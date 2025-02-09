@@ -1,7 +1,13 @@
+'use server';
+
 import 'server-only';
-import jwt from 'jsonwebtoken';
+import * as jose from 'jose';
 
 import cookies from '@/lib/cookies';
+
+const jwtConfig = {
+  secret: new TextEncoder().encode(process.env.JWT_SECRET),
+};
 
 const isAuthenticated = async () => {
   const token = await cookies.get('token');
@@ -11,8 +17,8 @@ const isAuthenticated = async () => {
   }
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET!);
-    return true;
+    const decoded = await jose.jwtVerify(token, jwtConfig.secret);
+    return decoded.payload ? true : false;
   } catch (error) {
     console.error(error);
     return false;
