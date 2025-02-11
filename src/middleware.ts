@@ -1,28 +1,31 @@
 import auth from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { Role } from './types/auth';
 
-const protectedRoutes = ['/dashboard', '/play'];
-const publicRoutes = ['/login', '/signup'];
+const roleRoutes = {
+  admin: ['/admin'],
+  player: ['/play'],
+  anon: ['/login', '/signup'],
+};
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
 
-  const isAuthenticated = await auth.isAuthenticated();
+  const session = await auth.getSession();
 
-  console.log('Testing middleware', path, isAuthenticated);
+  const routes = roleRoutes[session.role];
+  const allowedRoute = routes.includes(path);
 
-  if (isProtectedRoute && !isAuthenticated) {
+  if (!allowedRoute && session.role === Role.Anon) {
     return NextResponse.redirect(new URL('/login', req.nextUrl));
   }
 
   if (
-    isPublicRoute &&
-    isAuthenticated &&
-    !req.nextUrl.pathname.startsWith('/dashboard')
+    !allowedRoute &&
+    session.role !== Role.Anon &&
+    !req.nextUrl.pathname.startsWith(routes[0])
   ) {
-    return NextResponse.redirect(new URL('/dashboard', req.nextUrl));
+    return NextResponse.redirect(new URL(routes[0], req.nextUrl));
   }
 
   return NextResponse.next();
