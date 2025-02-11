@@ -18,7 +18,10 @@ export async function POST(request: Request) {
     role = 'admin';
   }
 
-  const token = await new jose.SignJWT()
+  const token = await new jose.SignJWT({
+    email,
+    role,
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
