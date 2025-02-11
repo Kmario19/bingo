@@ -5,11 +5,15 @@ import { Role } from './types/auth';
 const roleRoutes = {
   admin: ['/admin'],
   player: ['/play'],
-  anon: ['/login', '/signup'],
+  anon: ['/login', '/signup', '/logout'],
 };
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
+
+  if (path === '/api/logout') {
+    return NextResponse.next();
+  }
 
   const session = await auth.getSession();
 
