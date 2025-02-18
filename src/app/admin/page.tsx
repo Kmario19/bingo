@@ -19,6 +19,8 @@ import type { BingoCell } from '@/types/bingo';
 
 export default function AdminPage() {
   const [gameTitle, setGameTitle] = useState('');
+  const [dateStart, setDateStart] = useState('');
+  const [dateEnd, setDateEnd] = useState('');
   const [numCards, setNumCards] = useState(45);
   const [generatedCards, setGeneratedCards] = useState<BingoCell[][][]>([]);
 
@@ -60,10 +62,34 @@ export default function AdminPage() {
     return cards;
   };
 
+  // Function to call POST /api/juego to create a new game
+  const createGame = async () => {
+    const response = await fetch('/api/juego', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: gameTitle,
+        dateStart,
+        dateEnd,
+        numberOfCards: numCards,
+      }),
+    });
+
+    if (response.ok) {
+      const newGame = await response.json();
+      console.log('New game created:', newGame);
+    } else {
+      console.error('Failed to create new game:', response.statusText);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const cards = generateUniqueCards(numCards);
     setGeneratedCards(cards);
+    createGame();
   };
 
   return (
@@ -96,6 +122,30 @@ export default function AdminPage() {
                 max="100"
                 value={numCards}
                 onChange={(e) => setNumCards(Number.parseInt(e.target.value))}
+                required
+                className="rounded-xl border-2 border-gray-200 focus:border-purple-500 transition-colors"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateStart">Date Start</Label>
+              <Input
+                id="dateStart"
+                type="datetime-local"
+                value={dateStart}
+                onChange={(e) => setDateStart(e.target.value)}
+                placeholder="Enter date start"
+                required
+                className="rounded-xl border-2 border-gray-200 focus:border-purple-500 transition-colors"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateEnd">Date End</Label>
+              <Input
+                id="dateEnd"
+                type="datetime-local"
+                value={dateEnd}
+                onChange={(e) => setDateEnd(e.target.value)}
+                placeholder="Enter date end"
                 required
                 className="rounded-xl border-2 border-gray-200 focus:border-purple-500 transition-colors"
               />
