@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import BingoCard from '@/components/bingo-card';
-import LogoutButton from '@/components/logoutButton';
 
 import type { BingoCell } from '@/types/bingo';
 
@@ -93,7 +92,6 @@ export default function AdminPage() {
 
   return (
     <div>
-      <LogoutButton />
       <Card className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-lg mb-8">
         <CardHeader>
           <CardTitle className="text-center">Generate Bingo Cards</CardTitle>
