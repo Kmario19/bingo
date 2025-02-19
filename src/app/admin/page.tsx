@@ -62,7 +62,6 @@ export default function AdminPage() {
     return cards;
   };
 
-  // Function to call POST /api/juego to create a new game
   const createGame = async () => {
     const response = await fetch('/api/juego', {
       method: 'POST',
