@@ -70,3 +70,103 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes color-change-b {
+  0%,
+  100% {
+    color: theme("colors.red.500");
+  }
+  25% {
+    color: theme("colors.blue.500");
+  }
+  50% {
+    color: theme("colors.green.500");
+  }
+  75% {
+    color: theme("colors.yellow.500");
+  }
+}
+
+@keyframes color-change-i {
+  0%,
+  100% {
+    color: theme("colors.blue.500");
+  }
+  25% {
+    color: theme("colors.green.500");
+  }
+  50% {
+    color: theme("colors.yellow.500");
+  }
+  75% {
+    color: theme("colors.red.500");
+  }
+}
+
+@keyframes color-change-n {
+  0%,
+  100% {
+    color: theme("colors.green.500");
+  }
+  25% {
+    color: theme("colors.yellow.500");
+  }
+  50% {
+    color: theme("colors.red.500");
+  }
+  75% {
+    color: theme("colors.blue.500");
+  }
+}
+
+@keyframes color-change-g {
+  0%,
+  100% {
+    color: theme("colors.yellow.500");
+  }
+  25% {
+    color: theme("colors.red.500");
+  }
+  50% {
+    color: theme("colors.blue.500");
+  }
+  75% {
+    color: theme("colors.green.500");
+  }
+}
+
+@keyframes color-change-o {
+  0%,
+  100% {
+    color: theme("colors.purple.500");
+  }
+  25% {
+    color: theme("colors.pink.500");
+  }
+  50% {
+    color: theme("colors.indigo.500");
+  }
+  75% {
+    color: theme("colors.teal.500");
+  }
+}
+
+.animate-color-change-b {
+  animation: color-change-b 10s infinite;
+}
+
+.animate-color-change-i {
+  animation: color-change-i 10s infinite;
+}
+
+.animate-color-change-n {
+  animation: color-change-n 10s infinite;
+}
+
+.animate-color-change-g {
+  animation: color-change-g 10s infinite;
+}
+
+.animate-color-change-o {
+  animation: color-change-o 10s infinite;
+}
