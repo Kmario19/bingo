@@ -12,7 +12,9 @@ import { User } from 'lucide-react';
 import { redirect } from 'next/navigation';
 
 export default function Header() {
-  const handleLogout = async (event) => {
+  const handleLogout = async (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
     event.preventDefault();
 
     await fetch('/api/logout', {
