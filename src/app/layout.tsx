@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import Header from '@/components/header';
 import './globals.css';
 
 const geistSans = Geist({
@@ -18,7 +17,7 @@ export const metadata: Metadata = {
   description: 'Play and manage bingo games',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -28,7 +27,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
         <main>{children}</main>
       </body>
     </html>

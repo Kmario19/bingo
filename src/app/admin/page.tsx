@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import BingoCard from '@/components/bingo-card';
 
 import type { BingoCell } from '@/types/bingo';
+import Header from '@/components/header';
 
 export default function AdminPage() {
   const [gameTitle, setGameTitle] = useState('');
@@ -92,6 +93,7 @@ export default function AdminPage() {
 
   return (
     <div>
+      <Header />
       <Card className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-lg mb-8">
         <CardHeader>
           <CardTitle className="text-center">Generate Bingo Cards</CardTitle>
