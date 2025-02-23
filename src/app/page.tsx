@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PlusCircle, Users, Trophy, ArrowRight } from 'lucide-react';
+import { PlusCircle, Users, Trophy, ArrowRight, Grid2x2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,10 +24,28 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col items-center p-4">
+      {/* Animated Logo */}
+      <div className="mb-12 mt-8 text-center animate-fade-in">
+        <div className="relative inline-flex items-center justify-center">
+          <Grid2x2 className="w-24 h-24 text-white animate-pulse" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-4xl font-bold text-white tracking-wider animate-bounce">
+              B
+            </span>
+          </div>
+        </div>
+        <h1 className="text-4xl font-bold text-white mt-4 tracking-wide animate-fade-in-up">
+          BINGO
+        </h1>
+        <p className="text-white/80 mt-2 animate-fade-in-up delay-200">
+          Create or join a game to start playing!
+        </p>
+      </div>
+
       <div className="max-w-4xl w-full mx-auto grid md:grid-cols-2 gap-8">
         {/* Left side - Join Game */}
-        <div className="bg-card rounded-2xl shadow-xl p-8">
+        <div className="bg-card rounded-2xl shadow-xl p-8 animate-fade-in-left">
           <h2 className="text-3xl font-bold text-card-foreground mb-6 flex items-center gap-2">
             <Trophy className="w-8 h-8 text-yellow-500" />
             Join Game
@@ -52,7 +70,7 @@ export default function Home() {
         </div>
 
         {/* Right side - Create Game */}
-        <div className="bg-card rounded-2xl shadow-xl p-8">
+        <div className="bg-card rounded-2xl shadow-xl p-8 animate-fade-in-right">
           <h2 className="text-3xl font-bold text-card-foreground mb-6 flex items-center gap-2">
             <PlusCircle className="w-8 h-8 text-primary" />
             Create Game
