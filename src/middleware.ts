@@ -4,7 +4,7 @@ import { Role } from './types/auth';
 
 const roleRoutes = {
   admin: ['/admin'],
-  player: ['/play'],
+  player: ['/', '/play'],
   anon: ['/login', '/signup', '/logout'],
 };
 
