@@ -93,12 +93,12 @@ export default function Home() {
                   type="range"
                   id="maxPlayers"
                   min="2"
-                  max="10"
+                  max="45"
                   value={maxPlayers}
                   onChange={(e) => setMaxPlayers(Number(e.target.value))}
-                  className="flex-1"
+                  className="flex-1 shadow-none"
                 />
-                <div className="flex items-center gap-2 min-w-[80px]">
+                <div className="flex items-center text-right gap-2 min-w-[45px]">
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">{maxPlayers}</span>
                 </div>
