@@ -5,16 +5,29 @@ import { PlusCircle, Users, Trophy, ArrowRight, Grid2x2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import useLocalStorage from '@/hooks/useLocalStorage';
+import type { NewGame } from '@/types/game';
+import random from '@/lib/random';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
   const [gameName, setGameName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [gameCode, setGameCode] = useState('');
+  const [, setGame] = useLocalStorage<NewGame | null>('game', null);
 
   const handleCreateGame = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement game creation logic
-    console.log('Creating game:', { gameName, maxPlayers });
+
+    const game = {
+      id: random.generateUniqueCode(),
+      title: gameName,
+      maxPlayers,
+    };
+
+    setGame(game);
+
+    redirect(`/game/${game.id}`);
   };
 
   const handleJoinGame = (e: React.FormEvent) => {
