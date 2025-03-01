@@ -99,7 +99,7 @@ export default function GamePage() {
     }
 
     // Generate initial cards
-    const newCards = Array(game?.numberOfCards)
+    const newCards = Array(game?.maxPlayers)
       .fill(0)
       .map(() => generateBingoCard());
     setCards(newCards);
