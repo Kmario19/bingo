@@ -7,11 +7,12 @@ import { redirect } from 'next/navigation';
 
 import { useState, useEffect, useRef } from 'react';
 import {
-  Grid2x2,
   Volume2,
   VolumeX,
   ArrowLeft,
   CheckCircle,
+  Pause,
+  Play,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -72,11 +73,13 @@ export default function GamePage() {
     full: string;
   } | null>(null);
   const [previousCalls, setPreviousCalls] = useState<string[]>([]);
-  const [cards, setCards] = useState<any[]>([]);
+  const [cards, setCards] = useState([]);
   const [muted, setMuted] = useState(false);
   const [countdown, setCountdown] = useState(10);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isGeneratingCall = useRef(false);
 
   const [game] = useLocalStorage<Game | null>('game', null);
 
@@ -95,8 +98,8 @@ export default function GamePage() {
       speechSynthesisRef.current.pitch = 1;
     }
 
-    // Generate 4 bingo cards
-    const newCards = Array(4)
+    // Generate initial cards
+    const newCards = Array(game?.numberOfCards)
       .fill(0)
       .map(() => generateBingoCard());
     setCards(newCards);
@@ -105,179 +108,302 @@ export default function GamePage() {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+
+      // Clear any existing timer when component unmounts
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
-  }, []);
+  }, [game]);
+
+  // Generate a new call
+  const generateNewCall = () => {
+    // Prevent multiple simultaneous calls
+    if (isGeneratingCall.current) return;
+
+    isGeneratingCall.current = true;
+
+    try {
+      // Generate a new call
+      let newCall = getRandomBingoCall();
+
+      // Ensure we don't repeat a call
+      let attempts = 0;
+      while (previousCalls.includes(newCall.full) && attempts < 20) {
+        newCall = getRandomBingoCall();
+        attempts++;
+      }
+
+      // Only update if we found a unique call or tried enough times
+      if (!previousCalls.includes(newCall.full) || attempts >= 20) {
+        setCurrentCall(newCall);
+        setPreviousCalls((prev) => [newCall.full, ...prev].slice(0, 15));
+
+        // Play sound for the new call
+        if (!muted && speechSynthesisRef.current && window.speechSynthesis) {
+          speechSynthesisRef.current.text = `${newCall.letter} ${newCall.number}`;
+          window.speechSynthesis.speak(speechSynthesisRef.current);
+        }
+      }
+
+      // Reset countdown
+      setCountdown(10);
+    } finally {
+      isGeneratingCall.current = false;
+    }
+  };
 
   // Timer for changing numbers
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          // Generate a new call when countdown reaches 0
-          const newCall = getRandomBingoCall();
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
 
-          // Avoid repeating the same number
-          if (!previousCalls.includes(newCall.full)) {
-            setCurrentCall(newCall);
-            setPreviousCalls((prev) => [newCall.full, ...prev].slice(0, 15));
-
-            // Play sound for the new call
-            if (
-              !muted &&
-              speechSynthesisRef.current &&
-              window.speechSynthesis
-            ) {
-              speechSynthesisRef.current.text = `${newCall.letter} ${newCall.number}`;
-              window.speechSynthesis.speak(speechSynthesisRef.current);
+    // Only set up the timer if the game is not paused
+    if (!isPaused) {
+      timerRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            // Only generate a new call if we're not paused
+            if (!isPaused) {
+              generateNewCall();
             }
+            return 10;
           }
+          return prev - 1;
+        });
+      }, 1000);
+    }
 
-          return 10;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [previousCalls, muted]);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isPaused]);
 
   // Toggle sound
   const toggleMute = () => {
     setMuted(!muted);
   };
 
+  // Toggle pause/resume
+  const togglePause = () => {
+    setIsPaused((prev) => !prev);
+  };
+
+  // Manual call generation (only when paused)
+  const handleManualCall = () => {
+    if (isPaused) {
+      generateNewCall();
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col items-center p-4">
-      {/* Header with logo and back button */}
-      <div className="w-full max-w-7xl flex justify-between items-center mb-8">
-        <Link href="/">
-          <Button variant="ghost" className="text-white hover:bg-white/20">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Lobby
-          </Button>
-        </Link>
+    <main>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex flex-col items-center p-4">
+        {/* Header with logo and back button */}
+        <div className="w-full max-w-7xl flex justify-between items-center mb-8">
+          <Link href="/">
+            <Button variant="ghost" className="text-white hover:bg-white/20">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Lobby
+            </Button>
+          </Link>
 
-        <div className="flex items-center gap-2">
-          <Grid2x2 className="w-8 h-8 text-white" />
-          <h1 className="text-2xl font-bold text-white">BINGO</h1>
-        </div>
-
-        <Button
-          variant="ghost"
-          onClick={toggleMute}
-          className="text-white hover:bg-white/20"
-        >
-          {muted ? (
-            <VolumeX className="h-5 w-5" />
-          ) : (
-            <Volume2 className="h-5 w-5" />
-          )}
-        </Button>
-      </div>
-
-      {/* Main game display */}
-      <div className="w-full max-w-7xl">
-        {/* Current call display */}
-        <div className="bg-card rounded-2xl shadow-xl p-8 mb-8 text-center relative overflow-hidden">
-          <div className="absolute top-4 right-4 bg-primary/20 text-primary-foreground rounded-full px-3 py-1 text-sm font-medium">
-            Next call in: {countdown}s
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-white">{game?.title}</h1>
           </div>
 
-          <h2 className="text-xl font-semibold text-card-foreground mb-4">
-            Current Call
-          </h2>
-
-          {currentCall ? (
-            <div className="flex flex-col items-center justify-center animate-fade-in">
-              <div className="text-8xl font-bold text-primary mb-2 flex items-center">
-                <span>{currentCall.letter}</span>
-                <span>{currentCall.number}</span>
-              </div>
-              <p className="text-xl text-card-foreground/70">
-                {currentCall.letter} - {currentCall.number}
-              </p>
-            </div>
-          ) : (
-            <div className="h-40 flex items-center justify-center">
-              <p className="text-xl text-card-foreground/70">
-                Waiting for first call...
-              </p>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={togglePause}
+              className="text-white hover:bg-white/20"
+            >
+              {isPaused ? (
+                <Play className="h-5 w-5" />
+              ) : (
+                <Pause className="h-5 w-5" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={toggleMute}
+              className="text-white hover:bg-white/20"
+            >
+              {muted ? (
+                <VolumeX className="h-5 w-5" />
+              ) : (
+                <Volume2 className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         </div>
 
-        {/* Previous calls */}
-        <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
-          <h3 className="text-lg font-medium text-card-foreground mb-2">
-            Previous Calls
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {previousCalls.map((call, index) => (
-              <div
-                key={index}
-                className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium"
-              >
-                {call}
+        {/* Main game display */}
+        <div className="w-full max-w-7xl">
+          {/* Current call display */}
+          <div className="bg-card rounded-2xl shadow-xl p-8 mb-8 text-center relative overflow-hidden">
+            <div className="absolute top-4 right-4 bg-primary/20 text-primary-foreground rounded-full px-3 py-1 text-sm font-medium">
+              {isPaused ? (
+                <span className="flex items-center gap-1">
+                  <Pause className="h-3 w-3" /> Game Paused
+                </span>
+              ) : (
+                `Next call in: ${countdown}s`
+              )}
+            </div>
+
+            <h2 className="text-xl font-semibold text-card-foreground mb-4">
+              Current Call
+            </h2>
+
+            {currentCall ? (
+              <div className="flex flex-col items-center justify-center animate-fade-in">
+                <div className="text-8xl font-bold text-primary mb-2 flex items-center">
+                  <span>{currentCall.letter}</span>
+                  <span>{currentCall.number}</span>
+                </div>
+                <p className="text-xl text-card-foreground/70">
+                  {currentCall.letter} - {currentCall.number}
+                </p>
               </div>
-            ))}
-            {previousCalls.length === 0 && (
-              <p className="text-sm text-card-foreground/70">
-                No previous calls
-              </p>
+            ) : (
+              <div className="h-40 flex items-center justify-center">
+                <p className="text-xl text-card-foreground/70">
+                  Waiting for first call...
+                </p>
+              </div>
             )}
           </div>
-        </div>
 
-        {/* Bingo cards */}
-        <h3 className="text-xl font-bold text-white mb-4">Your Bingo Cards</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {cards.map((card, cardIndex) => (
-            <div key={cardIndex} className="bg-card rounded-xl shadow-lg p-4">
-              <div className="grid grid-cols-5 gap-1 mb-2">
-                {BINGO_COLUMNS.map((col) => (
-                  <div
-                    key={col.letter}
-                    className="bg-primary text-primary-foreground font-bold text-center py-2 rounded-md"
-                  >
-                    {col.letter}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-5 gap-1">
-                {card.map((column: any, colIndex: number) =>
-                  column.numbers.map((number: number, numIndex: number) => {
-                    const isMarked = previousCalls.includes(
-                      `${column.letter}${number}`
-                    );
-                    const isFreeSpace =
-                      number === 0 && colIndex === 2 && numIndex === 2;
-
-                    return (
-                      <div
-                        key={`${colIndex}-${numIndex}`}
-                        className={`aspect-square flex items-center justify-center rounded-md text-lg font-medium
-                          ${isFreeSpace ? 'bg-primary/20' : 'bg-card'}
-                          ${isMarked ? 'bg-primary/30 text-primary-foreground' : 'border border-border'}
-                        `}
-                      >
-                        {isFreeSpace ? (
-                          <CheckCircle className="h-5 w-5 text-primary" />
-                        ) : (
-                          <>
-                            {number}
-                            {isMarked && (
-                              <div className="absolute w-full h-0.5 bg-primary-foreground rotate-45"></div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+          {/* Previous calls */}
+          <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
+            <h3 className="text-lg font-medium text-card-foreground mb-2">
+              Previous Calls
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {previousCalls.map((call, index) => (
+                <div
+                  key={index}
+                  className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium"
+                >
+                  {call}
+                </div>
+              ))}
+              {previousCalls.length === 0 && (
+                <p className="text-sm text-card-foreground/70">
+                  No previous calls
+                </p>
+              )}
             </div>
-          ))}
+          </div>
+
+          {/* Game controls */}
+          <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
+            <h3 className="text-lg font-medium text-card-foreground mb-2">
+              Game Controls
+            </h3>
+            <div className="flex gap-2">
+              <Button
+                onClick={togglePause}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {isPaused ? (
+                  <>
+                    <Play className="h-4 w-4" /> Resume Game
+                  </>
+                ) : (
+                  <>
+                    <Pause className="h-4 w-4" /> Pause Game
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={toggleMute}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {muted ? (
+                  <>
+                    <Volume2 className="h-4 w-4" /> Unmute
+                  </>
+                ) : (
+                  <>
+                    <VolumeX className="h-4 w-4" /> Mute
+                  </>
+                )}
+              </Button>
+              {isPaused && (
+                <Button
+                  onClick={handleManualCall}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  Next Call
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Bingo cards */}
+          <h3 className="text-xl font-bold text-white mb-4">
+            Your Bingo Cards
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {cards.map((card, cardIndex) => (
+              <div key={cardIndex} className="bg-card rounded-xl shadow-lg p-4">
+                <div className="grid grid-cols-5 gap-1 mb-2">
+                  {BINGO_COLUMNS.map((col) => (
+                    <div
+                      key={col.letter}
+                      className="bg-primary text-primary-foreground font-bold text-center py-2 rounded-md"
+                    >
+                      {col.letter}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-5 gap-1">
+                  {card.map((column: any, colIndex: number) =>
+                    column.numbers.map((number: number, numIndex: number) => {
+                      const isMarked = previousCalls.includes(
+                        `${column.letter}${number}`
+                      );
+                      const isFreeSpace =
+                        number === 0 && colIndex === 2 && numIndex === 2;
+
+                      return (
+                        <div
+                          key={`${colIndex}-${numIndex}`}
+                          className={`aspect-square flex items-center justify-center rounded-md text-lg font-medium
+                            ${isFreeSpace ? 'bg-primary/20' : 'bg-card'}
+                            ${isMarked ? 'bg-primary/30 text-primary-foreground' : 'border border-border'}
+                          `}
+                        >
+                          {isFreeSpace ? (
+                            <CheckCircle className="h-5 w-5 text-primary" />
+                          ) : (
+                            <>
+                              {number}
+                              {isMarked && (
+                                <div className="absolute w-full h-0.5 bg-primary-foreground rotate-45"></div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </main>
