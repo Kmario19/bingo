@@ -73,14 +73,22 @@ export default function GamePage() {
     full: string;
   } | null>(null);
   const [previousCalls, setPreviousCalls] = useState<string[]>([]);
-  const [cards, setCards] = useState([]);
+  const [calledNumbersByColumn, setCalledNumbersByColumn] = useState<
+    Record<string, number[]>
+  >({
+    B: [],
+    I: [],
+    N: [],
+    G: [],
+    O: [],
+  });
+  const [cards, setCards] = useState<any[]>([]);
   const [muted, setMuted] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [isPaused, setIsPaused] = useState(false);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isGeneratingCall = useRef(false);
-
   const [game] = useLocalStorage<Game | null>('game', null);
 
   useEffect(() => {
@@ -105,7 +113,7 @@ export default function GamePage() {
     setCards(newCards);
 
     return () => {
-      if (window.speechSynthesis) {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
 
@@ -137,10 +145,25 @@ export default function GamePage() {
       // Only update if we found a unique call or tried enough times
       if (!previousCalls.includes(newCall.full) || attempts >= 20) {
         setCurrentCall(newCall);
-        setPreviousCalls((prev) => [newCall.full, ...prev].slice(0, 15));
+        setPreviousCalls((prev) => [newCall.full, ...prev]);
+
+        // Update called numbers by column
+        setCalledNumbersByColumn((prev) => {
+          const newState = { ...prev };
+          newState[newCall.letter] = [
+            ...newState[newCall.letter],
+            newCall.number,
+          ].sort((a, b) => a - b);
+          return newState;
+        });
 
         // Play sound for the new call
-        if (!muted && speechSynthesisRef.current && window.speechSynthesis) {
+        if (
+          !muted &&
+          speechSynthesisRef.current &&
+          typeof window !== 'undefined' &&
+          window.speechSynthesis
+        ) {
           speechSynthesisRef.current.text = `${newCall.letter} ${newCall.number}`;
           window.speechSynthesis.speak(speechSynthesisRef.current);
         }
@@ -166,10 +189,8 @@ export default function GamePage() {
       timerRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
-            // Only generate a new call if we're not paused
-            if (!isPaused) {
-              generateNewCall();
-            }
+            // Generate a new call when countdown reaches 0
+            generateNewCall();
             return 10;
           }
           return prev - 1;
@@ -186,7 +207,7 @@ export default function GamePage() {
 
   // Toggle sound
   const toggleMute = () => {
-    setMuted(!muted);
+    setMuted((prev) => !prev);
   };
 
   // Toggle pause/resume
@@ -281,13 +302,43 @@ export default function GamePage() {
             )}
           </div>
 
+          {/* Called Numbers Table */}
+          <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
+            <h3 className="text-lg font-medium text-card-foreground mb-4">
+              Called Numbers
+            </h3>
+            <div className="grid grid-cols-5 gap-2">
+              {BINGO_COLUMNS.map((column) => (
+                <div key={column.letter} className="flex flex-col">
+                  <div className="bg-primary text-primary-foreground font-bold text-center py-2 rounded-t-md">
+                    {column.letter}
+                  </div>
+                  <div className="bg-card border border-border rounded-b-md p-2 min-h-[200px]">
+                    <div className="grid grid-cols-3 gap-1">
+                      {calledNumbersByColumn[column.letter].map(
+                        (number, index) => (
+                          <div
+                            key={`${column.letter}-${number}`}
+                            className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium text-center"
+                          >
+                            {number}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Previous calls */}
           <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
             <h3 className="text-lg font-medium text-card-foreground mb-2">
-              Previous Calls
+              Recent Calls
             </h3>
             <div className="flex flex-wrap gap-2">
-              {previousCalls.map((call, index) => (
+              {previousCalls.slice(0, 15).map((call, index) => (
                 <div
                   key={index}
                   className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium"
@@ -382,9 +433,9 @@ export default function GamePage() {
                         <div
                           key={`${colIndex}-${numIndex}`}
                           className={`aspect-square flex items-center justify-center rounded-md text-lg font-medium
-                            ${isFreeSpace ? 'bg-primary/20' : 'bg-card'}
-                            ${isMarked ? 'bg-primary/30 text-primary-foreground' : 'border border-border'}
-                          `}
+                          ${isFreeSpace ? 'bg-primary/20' : 'bg-card'}
+                          ${isMarked ? 'bg-primary/30 text-primary-foreground' : 'border border-border'}
+                        `}
                         >
                           {isFreeSpace ? (
                             <CheckCircle className="h-5 w-5 text-primary" />
