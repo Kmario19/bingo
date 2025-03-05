@@ -89,7 +89,10 @@ export default function GamePage() {
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isGeneratingCall = useRef(false);
-  const [game] = useLocalStorage<Game | null>('game', null);
+  const [game] = useLocalStorage<Game>('game', {
+    title: 'Bingo',
+    maxPlayers: 0,
+  } as Game);
 
   useEffect(() => {
     const id = location.pathname.split('/').pop();
@@ -107,7 +110,7 @@ export default function GamePage() {
     }
 
     // Generate initial cards
-    const newCards = Array(game?.maxPlayers)
+    const newCards = Array(game.maxPlayers)
       .fill(0)
       .map(() => generateBingoCard());
     setCards(newCards);
@@ -232,7 +235,7 @@ export default function GamePage() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <p className="text-2xl font-bold text-white">{game?.title}</p>
+            <span className="text-2xl font-bold text-white">{game.title}</span>
           </div>
 
           <div className="flex items-center gap-2">
