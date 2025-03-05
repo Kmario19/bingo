@@ -5,7 +5,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import { Game } from '@/types/game';
 import { redirect } from 'next/navigation';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Volume2,
   VolumeX,
@@ -125,7 +125,8 @@ export default function GamePage() {
   }, [game]);
 
   // Generate a new call
-  const generateNewCall = () => {
+  const generateNewCall = useCallback(() => {
+    // Validate if the game is over
     // Prevent multiple simultaneous calls
     if (isGeneratingCall.current) return;
 
@@ -136,37 +137,32 @@ export default function GamePage() {
       let newCall = getRandomBingoCall();
 
       // Ensure we don't repeat a call
-      let attempts = 0;
-      while (previousCalls.includes(newCall.full) && attempts < 20) {
+      while (calledNumbersByColumn[newCall.letter].includes(newCall.number)) {
         newCall = getRandomBingoCall();
-        attempts++;
       }
 
-      // Only update if we found a unique call or tried enough times
-      if (!previousCalls.includes(newCall.full) || attempts >= 20) {
-        setCurrentCall(newCall);
-        setPreviousCalls((prev) => [newCall.full, ...prev]);
+      setCurrentCall(newCall);
+      setPreviousCalls((prev) => [newCall.full, ...prev]);
 
-        // Update called numbers by column
-        setCalledNumbersByColumn((prev) => {
-          const newState = { ...prev };
-          newState[newCall.letter] = [
-            ...newState[newCall.letter],
-            newCall.number,
-          ].sort((a, b) => a - b);
-          return newState;
-        });
+      // Update called numbers by column
+      setCalledNumbersByColumn((prev) => {
+        const newState = { ...prev };
+        newState[newCall.letter] = [
+          ...newState[newCall.letter],
+          newCall.number,
+        ].sort((a, b) => a - b);
+        return newState;
+      });
 
-        // Play sound for the new call
-        if (
-          !muted &&
-          speechSynthesisRef.current &&
-          typeof window !== 'undefined' &&
-          window.speechSynthesis
-        ) {
-          speechSynthesisRef.current.text = `${newCall.letter} ${newCall.number}`;
-          window.speechSynthesis.speak(speechSynthesisRef.current);
-        }
+      // Play sound for the new call
+      if (
+        !muted &&
+        speechSynthesisRef.current &&
+        typeof window !== 'undefined' &&
+        window.speechSynthesis
+      ) {
+        speechSynthesisRef.current.text = `${newCall.letter} ${newCall.number}`;
+        window.speechSynthesis.speak(speechSynthesisRef.current);
       }
 
       // Reset countdown
@@ -174,7 +170,7 @@ export default function GamePage() {
     } finally {
       isGeneratingCall.current = false;
     }
-  };
+  }, [calledNumbersByColumn, muted]);
 
   // Timer for changing numbers
   useEffect(() => {
@@ -203,7 +199,7 @@ export default function GamePage() {
         clearInterval(timerRef.current);
       }
     };
-  }, [isPaused]);
+  }, [isPaused, generateNewCall]);
 
   // Toggle sound
   const toggleMute = () => {
@@ -236,7 +232,7 @@ export default function GamePage() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-white">{game?.title}</h1>
+            <p className="text-2xl font-bold text-white">{game?.title}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -434,7 +430,7 @@ export default function GamePage() {
                           key={`${colIndex}-${numIndex}`}
                           className={`aspect-square flex items-center justify-center rounded-md text-lg font-medium
                           ${isFreeSpace ? 'bg-primary/20' : 'bg-card'}
-                          ${isMarked ? 'bg-primary/30 text-primary-foreground' : 'border border-border'}
+                          ${isMarked ? 'bg-primary/30 text-primary-foreground relative' : 'border border-border'}
                         `}
                         >
                           {isFreeSpace ? (
