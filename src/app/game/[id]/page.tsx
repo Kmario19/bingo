@@ -167,9 +167,6 @@ export default function GamePage() {
         speechSynthesisRef.current.text = `${newCall.letter} ${newCall.number}`;
         window.speechSynthesis.speak(speechSynthesisRef.current);
       }
-
-      // Reset countdown
-      setCountdown(10);
     } finally {
       isGeneratingCall.current = false;
     }
