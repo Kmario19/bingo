@@ -2,7 +2,7 @@
 
 import Header from '@/components/header';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { Game } from '@/types/game';
+import { Game, BingoColumn, CardColumn, Card } from '@/types/game';
 import { redirect } from 'next/navigation';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 // Bingo columns with their corresponding letters
-const BINGO_COLUMNS = [
+const BINGO_COLUMNS: BingoColumn[] = [
   { letter: 'B', range: [1, 15] },
   { letter: 'I', range: [16, 30] },
   { letter: 'N', range: [31, 45] },
@@ -41,7 +41,7 @@ const getRandomBingoCall = () => {
 
 // Generate a bingo card with random numbers
 const generateBingoCard = () => {
-  const card = BINGO_COLUMNS.map((column) => {
+  const card: Card = BINGO_COLUMNS.map((column) => {
     const numbers = [];
     const usedNumbers = new Set();
 
@@ -82,7 +82,7 @@ export default function GamePage() {
     G: [],
     O: [],
   });
-  const [cards, setCards] = useState<any[]>([]);
+  const [cards, setCards] = useState<Card[]>([]);
   const [muted, setMuted] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [isPaused, setIsPaused] = useState(false);
@@ -311,16 +311,14 @@ export default function GamePage() {
                   </div>
                   <div className="bg-card border border-border rounded-b-md p-2 min-h-[200px]">
                     <div className="grid grid-cols-3 gap-1">
-                      {calledNumbersByColumn[column.letter].map(
-                        (number, index) => (
-                          <div
-                            key={`${column.letter}-${number}`}
-                            className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium text-center"
-                          >
-                            {number}
-                          </div>
-                        )
-                      )}
+                      {calledNumbersByColumn[column.letter].map((number) => (
+                        <div
+                          key={`${column.letter}-${number}`}
+                          className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium text-center"
+                        >
+                          {number}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -406,18 +404,18 @@ export default function GamePage() {
             {cards.map((card, cardIndex) => (
               <div key={cardIndex} className="bg-card rounded-xl shadow-lg p-4">
                 <div className="grid grid-cols-5 gap-1 mb-2">
-                  {BINGO_COLUMNS.map((col) => (
+                  {BINGO_COLUMNS.map((column) => (
                     <div
-                      key={col.letter}
+                      key={column.letter}
                       className="bg-primary text-primary-foreground font-bold text-center py-2 rounded-md"
                     >
-                      {col.letter}
+                      {column.letter}
                     </div>
                   ))}
                 </div>
 
                 <div className="grid grid-cols-5 gap-1">
-                  {card.map((column: any, colIndex: number) =>
+                  {card.map((column: CardColumn, colIndex: number) =>
                     column.numbers.map((number: number, numIndex: number) => {
                       const isMarked = previousCalls.includes(
                         `${column.letter}${number}`
