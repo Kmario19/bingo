@@ -8,3 +8,15 @@ export type Game = {
 };
 
 export type NewGame = Omit<Game, 'dateStart' | 'dateEnd' | 'numberOfCards'>;
+
+export type BingoColumn = {
+  letter: string;
+  range: [number, number];
+};
+
+export type CardColumn = {
+  letter: string;
+  numbers: Array<number>;
+};
+
+export type Card = Array<CardColumn>;
