@@ -10,6 +10,7 @@ import { Volume2, VolumeX, ArrowLeft, Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import BingoCard from '@/components/game/bingo-card';
+import GameControls from '@/components/game/game-controls';
 
 // Bingo columns with their corresponding letters
 const BINGO_COLUMNS: BingoColumn[] = [
@@ -336,55 +337,14 @@ export default function GamePage({ params }: GamePageProps) {
             </div>
           </div>
 
-          {/* Game controls */}
-          <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
-            <h3 className="text-lg font-medium text-card-foreground mb-2">
-              Game Controls
-            </h3>
-            <div className="flex gap-2">
-              <Button
-                onClick={togglePause}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                {isPaused ? (
-                  <>
-                    <Play className="h-4 w-4" /> Resume Game
-                  </>
-                ) : (
-                  <>
-                    <Pause className="h-4 w-4" /> Pause Game
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={toggleMute}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                {muted ? (
-                  <>
-                    <Volume2 className="h-4 w-4" /> Unmute
-                  </>
-                ) : (
-                  <>
-                    <VolumeX className="h-4 w-4" /> Mute
-                  </>
-                )}
-              </Button>
-              {isPaused && (
-                <Button
-                  onClick={handleManualCall}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  Next Call
-                </Button>
-              )}
-            </div>
-          </div>
+          <GameControls
+            isPaused={isPaused}
+            togglePause={togglePause}
+            muted={muted}
+            toggleMute={toggleMute}
+            handleManualCall={handleManualCall}
+          />
 
-          {/* Bingo cards */}
           <h3 className="text-xl font-bold text-white mb-4">
             Your Bingo Cards
           </h3>
