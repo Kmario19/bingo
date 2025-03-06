@@ -5,7 +5,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import { Game, BingoColumn, CardColumn, Card } from '@/types/game';
 import { redirect } from 'next/navigation';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { use, useState, useEffect, useRef, useCallback } from 'react';
 import {
   Volume2,
   VolumeX,
@@ -66,7 +66,11 @@ const generateBingoCard = () => {
   return card;
 };
 
-export default function GamePage() {
+interface GamePageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function GamePage({ params }: GamePageProps) {
   const [currentCall, setCurrentCall] = useState<{
     letter: string;
     number: number;
@@ -94,12 +98,13 @@ export default function GamePage() {
     maxPlayers: 0,
   } as Game);
 
+  const { id } = use(params);
+
   useEffect(() => {
-    const id = location.pathname.split('/').pop();
     if (!game || game.id !== id) {
       redirect('/');
     }
-  }, [game]);
+  }, [game, id]);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -114,17 +119,6 @@ export default function GamePage() {
       .fill(0)
       .map(() => generateBingoCard());
     setCards(newCards);
-
-    return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-
-      // Clear any existing timer when component unmounts
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
   }, [game]);
 
   // Generate a new call
