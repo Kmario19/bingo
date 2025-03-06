@@ -2,20 +2,14 @@
 
 import Header from '@/components/header';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { Game, BingoColumn, CardColumn, Card } from '@/types/game';
+import { Game, BingoColumn, Card } from '@/types/game';
 import { redirect } from 'next/navigation';
 
 import { use, useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Volume2,
-  VolumeX,
-  ArrowLeft,
-  CheckCircle,
-  Pause,
-  Play,
-} from 'lucide-react';
+import { Volume2, VolumeX, ArrowLeft, Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import BingoCard from '@/components/game/bingo-card';
 
 // Bingo columns with their corresponding letters
 const BINGO_COLUMNS: BingoColumn[] = [
@@ -396,51 +390,11 @@ export default function GamePage({ params }: GamePageProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {cards.map((card, cardIndex) => (
-              <div key={cardIndex} className="bg-card rounded-xl shadow-lg p-4">
-                <div className="grid grid-cols-5 gap-1 mb-2">
-                  {BINGO_COLUMNS.map((column) => (
-                    <div
-                      key={column.letter}
-                      className="bg-primary text-primary-foreground font-bold text-center py-2 rounded-md"
-                    >
-                      {column.letter}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-5 gap-1">
-                  {card.map((column: CardColumn, colIndex: number) =>
-                    column.numbers.map((number: number, numIndex: number) => {
-                      const isMarked = previousCalls.includes(
-                        `${column.letter}${number}`
-                      );
-                      const isFreeSpace =
-                        number === 0 && colIndex === 2 && numIndex === 2;
-
-                      return (
-                        <div
-                          key={`${colIndex}-${numIndex}`}
-                          className={`aspect-square flex items-center justify-center rounded-md text-lg font-medium
-                          ${isFreeSpace ? 'bg-primary/20' : 'bg-card'}
-                          ${isMarked ? 'bg-primary/30 text-primary-foreground relative' : 'border border-border'}
-                        `}
-                        >
-                          {isFreeSpace ? (
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                          ) : (
-                            <>
-                              {number}
-                              {isMarked && (
-                                <div className="absolute w-full h-0.5 bg-primary-foreground rotate-45"></div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+              <BingoCard
+                card={card}
+                key={cardIndex}
+                previousCalls={previousCalls}
+              />
             ))}
           </div>
         </div>
