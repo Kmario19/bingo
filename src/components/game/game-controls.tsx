@@ -9,6 +9,7 @@ interface GameControlsProps {
   muted: boolean;
   toggleMute: () => void;
   handleManualCall: () => void;
+  winningCard: number | null;
 }
 
 export default function GameControls({
@@ -17,6 +18,7 @@ export default function GameControls({
   muted,
   toggleMute,
   handleManualCall,
+  winningCard,
 }: GameControlsProps) {
   return (
     <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
@@ -28,6 +30,7 @@ export default function GameControls({
           onClick={togglePause}
           variant="outline"
           className="flex items-center gap-2"
+          disabled={winningCard !== null}
         >
           {isPaused ? (
             <>
@@ -54,7 +57,7 @@ export default function GameControls({
             </>
           )}
         </Button>
-        {isPaused && (
+        {isPaused && winningCard === null && (
           <Button
             onClick={handleManualCall}
             variant="outline"

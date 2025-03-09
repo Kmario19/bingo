@@ -6,9 +6,14 @@ import BingoCard from './bingo-card';
 interface BingoCardsProps {
   cards: Card[];
   previousCalls: string[];
+  winningCard: number | null;
 }
 
-export default function BingoCards({ cards, previousCalls }: BingoCardsProps) {
+export default function BingoCards({
+  cards,
+  previousCalls,
+  winningCard,
+}: BingoCardsProps) {
   return (
     <div>
       <h3 className="text-xl font-bold text-white mb-4">Your Bingo Cards</h3>
@@ -17,7 +22,9 @@ export default function BingoCards({ cards, previousCalls }: BingoCardsProps) {
           <BingoCard
             card={card}
             key={cardIndex}
+            cardKey={cardIndex}
             previousCalls={previousCalls}
+            winningCard={winningCard}
           />
         ))}
       </div>

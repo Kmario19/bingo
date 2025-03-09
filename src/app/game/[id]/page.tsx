@@ -6,7 +6,7 @@ import { Game, BingoColumn, Card } from '@/types/game';
 import { redirect } from 'next/navigation';
 
 import { use, useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, ArrowLeft, Pause, Play } from 'lucide-react';
+import { Volume2, VolumeX, ArrowLeft, Pause, Play, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import GameControls from '@/components/game/game-controls';
@@ -63,6 +63,55 @@ const generateBingoCard = () => {
   return card;
 };
 
+const checkForWin = (card: Card, previousCalls: string[]) => {
+  // Check rows
+  for (let row = 0; row < 5; row++) {
+    let rowComplete = true;
+    for (let col = 0; col < 5; col++) {
+      const number = card[col].numbers[row];
+      const call = `${card[col].letter}${number}`;
+      if (number !== 0 && !previousCalls.includes(call)) {
+        rowComplete = false;
+        break;
+      }
+    }
+    if (rowComplete) return true;
+  }
+
+  // Check columns
+  for (let col = 0; col < 5; col++) {
+    let colComplete = true;
+    for (let row = 0; row < 5; row++) {
+      const number = card[col].numbers[row];
+      const call = `${card[col].letter}${number}`;
+      if (number !== 0 && !previousCalls.includes(call)) {
+        colComplete = false;
+        break;
+      }
+    }
+    if (colComplete) return true;
+  }
+
+  // Check diagonals
+  let diagonal1Complete = true;
+  let diagonal2Complete = true;
+  for (let i = 0; i < 5; i++) {
+    const number1 = card[i].numbers[i];
+    const call1 = `${card[i].letter}${number1}`;
+    if (number1 !== 0 && !previousCalls.includes(call1)) {
+      diagonal1Complete = false;
+    }
+
+    const number2 = card[i].numbers[4 - i];
+    const call2 = `${card[i].letter}${number2}`;
+    if (number2 !== 0 && !previousCalls.includes(call2)) {
+      diagonal2Complete = false;
+    }
+  }
+
+  return diagonal1Complete || diagonal2Complete;
+};
+
 interface GamePageProps {
   params: Promise<{ id: string }>;
 }
@@ -87,6 +136,7 @@ export default function GamePage({ params }: GamePageProps) {
   const [muted, setMuted] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [isPaused, setIsPaused] = useState(false);
+  const [winningCard, setWinningCard] = useState<number | null>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isGeneratingCall = useRef(false);
@@ -136,7 +186,19 @@ export default function GamePage({ params }: GamePageProps) {
       }
 
       setCurrentCall(newCall);
-      setPreviousCalls((prev) => [newCall.full, ...prev]);
+      setPreviousCalls((prev) => {
+        const newCalls = [newCall.full, ...prev];
+
+        // Check for wins after adding new call
+        cards.forEach((card, index) => {
+          if (checkForWin(card, newCalls)) {
+            setWinningCard(index);
+            setIsPaused(true);
+          }
+        });
+
+        return newCalls;
+      });
 
       // Update called numbers by column
       setCalledNumbersByColumn((prev) => {
@@ -171,8 +233,7 @@ export default function GamePage({ params }: GamePageProps) {
       timerRef.current = null;
     }
 
-    // Only set up the timer if the game is not paused
-    if (!isPaused) {
+    if (!isPaused && winningCard === null) {
       timerRef.current = setInterval(() => {
         setCountdown((prev) => {
           if (prev <= 1) {
@@ -190,7 +251,7 @@ export default function GamePage({ params }: GamePageProps) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isPaused, generateNewCall]);
+  }, [isPaused, winningCard, generateNewCall]);
 
   // Toggle sound
   const toggleMute = () => {
@@ -199,12 +260,13 @@ export default function GamePage({ params }: GamePageProps) {
 
   // Toggle pause/resume
   const togglePause = () => {
+    if (winningCard !== null) return;
     setIsPaused((prev) => !prev);
   };
 
   // Manual call generation (only when paused)
   const handleManualCall = () => {
-    if (isPaused) {
+    if (isPaused && winningCard === null) {
       generateNewCall();
     }
   };
@@ -231,6 +293,7 @@ export default function GamePage({ params }: GamePageProps) {
               variant="ghost"
               onClick={togglePause}
               className="text-white hover:bg-white/20"
+              disabled={winningCard !== null}
             >
               {isPaused ? (
                 <Play className="h-5 w-5" />
@@ -254,12 +317,24 @@ export default function GamePage({ params }: GamePageProps) {
 
         {/* Main game display */}
         <div className="w-full max-w-7xl">
+          {winningCard !== null && (
+            <div className="bg-yellow-500/90 text-white rounded-2xl shadow-xl p-8 mb-8 text-center animate-fade-in">
+              <Trophy className="w-16 h-16 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold mb-2">BINGO!</h2>
+              <p className="text-xl">Card {winningCard + 1} has won!</p>
+            </div>
+          )}
+
           {/* Current call display */}
           <div className="bg-card rounded-2xl shadow-xl p-8 mb-8 text-center relative overflow-hidden">
             <div className="absolute top-4 right-4 bg-primary/20 text-primary-foreground rounded-full px-3 py-1 text-sm font-medium">
               {isPaused ? (
                 <span className="flex items-center gap-1">
                   <Pause className="h-3 w-3" /> Game Paused
+                </span>
+              ) : winningCard !== null ? (
+                <span className="flex items-center gap-1">
+                  <Trophy className="h-3 w-3" /> Game Over
                 </span>
               ) : (
                 `Next call in: ${countdown}s`
@@ -302,9 +377,14 @@ export default function GamePage({ params }: GamePageProps) {
             muted={muted}
             toggleMute={toggleMute}
             handleManualCall={handleManualCall}
+            winningCard={winningCard}
           />
 
-          <BingoCards cards={cards} previousCalls={previousCalls} />
+          <BingoCards
+            cards={cards}
+            previousCalls={previousCalls}
+            winningCard={winningCard}
+          />
         </div>
       </div>
     </main>
