@@ -9,10 +9,10 @@ import { use, useState, useEffect, useRef, useCallback } from 'react';
 import { Volume2, VolumeX, ArrowLeft, Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import BingoCard from '@/components/game/bingo-card';
 import GameControls from '@/components/game/game-controls';
 import PreviousCalls from '@/components/game/previous-calls';
 import CalledNumbers from '@/components/game/called-numbers';
+import BingoCards from '@/components/game/bingo-cards';
 
 // Bingo columns with their corresponding letters
 const BINGO_COLUMNS: BingoColumn[] = [
@@ -304,18 +304,7 @@ export default function GamePage({ params }: GamePageProps) {
             handleManualCall={handleManualCall}
           />
 
-          <h3 className="text-xl font-bold text-white mb-4">
-            Your Bingo Cards
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {cards.map((card, cardIndex) => (
-              <BingoCard
-                card={card}
-                key={cardIndex}
-                previousCalls={previousCalls}
-              />
-            ))}
-          </div>
+          <BingoCards cards={cards} previousCalls={previousCalls} />
         </div>
       </div>
     </main>
