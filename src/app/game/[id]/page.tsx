@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import BingoCard from '@/components/game/bingo-card';
 import GameControls from '@/components/game/game-controls';
+import PreviousCalls from '@/components/game/previous-calls';
 
 // Bingo columns with their corresponding letters
 const BINGO_COLUMNS: BingoColumn[] = [
@@ -315,27 +316,7 @@ export default function GamePage({ params }: GamePageProps) {
             </div>
           </div>
 
-          {/* Previous calls */}
-          <div className="bg-card/90 rounded-xl shadow-lg p-4 mb-8">
-            <h3 className="text-lg font-medium text-card-foreground mb-2">
-              Recent Calls
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {previousCalls.slice(0, 15).map((call, index) => (
-                <div
-                  key={index}
-                  className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium"
-                >
-                  {call}
-                </div>
-              ))}
-              {previousCalls.length === 0 && (
-                <p className="text-sm text-card-foreground/70">
-                  No previous calls
-                </p>
-              )}
-            </div>
-          </div>
+          <PreviousCalls previousCalls={previousCalls} />
 
           <GameControls
             isPaused={isPaused}
