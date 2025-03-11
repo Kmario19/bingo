@@ -6,9 +6,7 @@ import { Game, BingoColumn, Card } from '@/types/game';
 import { redirect } from 'next/navigation';
 
 import { use, useState, useEffect, useRef, useCallback } from 'react';
-import { Volume2, VolumeX, ArrowLeft, Pause, Play, Trophy } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { Trophy } from 'lucide-react';
 import GameControls from '@/components/game/game-controls';
 import PreviousCalls from '@/components/game/previous-calls';
 import CalledNumbers from '@/components/game/called-numbers';
