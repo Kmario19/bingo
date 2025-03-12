@@ -223,7 +223,7 @@ export default function GamePage({ params }: GamePageProps) {
     } finally {
       isGeneratingCall.current = false;
     }
-  }, [calledNumbersByColumn, muted]);
+  }, [calledNumbersByColumn, cards, muted]);
 
   // Timer for changing numbers
   useEffect(() => {
