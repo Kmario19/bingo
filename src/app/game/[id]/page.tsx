@@ -318,6 +318,7 @@ export default function GamePage({ params }: GamePageProps) {
 
           <BingoCards
             cards={cards}
+            bingoColumns={BINGO_COLUMNS}
             previousCalls={previousCalls}
             winningCard={winningCard}
           />

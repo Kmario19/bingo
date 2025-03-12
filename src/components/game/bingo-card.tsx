@@ -4,17 +4,10 @@ import { BingoColumn, Card, CardColumn } from '@/types/game';
 
 import { CheckCircle, Trophy } from 'lucide-react';
 
-const BINGO_COLUMNS: BingoColumn[] = [
-  { letter: 'B', range: [1, 15] },
-  { letter: 'I', range: [16, 30] },
-  { letter: 'N', range: [31, 45] },
-  { letter: 'G', range: [46, 60] },
-  { letter: 'O', range: [61, 75] },
-];
-
 interface BingoCardProps {
   card: Card;
   cardKey: number;
+  bingoColumns: BingoColumn[];
   previousCalls: string[];
   winningCard: number | null;
 }
@@ -22,6 +15,7 @@ interface BingoCardProps {
 export default function BingoCard({
   card,
   cardKey,
+  bingoColumns,
   previousCalls,
   winningCard,
 }: BingoCardProps) {
@@ -35,7 +29,7 @@ export default function BingoCard({
         </div>
       )}
       <div className="grid grid-cols-5 gap-1 mb-2">
-        {BINGO_COLUMNS.map((column) => (
+        {bingoColumns.map((column) => (
           <div
             key={column.letter}
             className="bg-primary text-primary-foreground font-bold text-center py-2 rounded-md"

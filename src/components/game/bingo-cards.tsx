@@ -1,16 +1,18 @@
 'use client';
 
-import { Card } from '@/types/game';
+import { BingoColumn, Card } from '@/types/game';
 import BingoCard from './bingo-card';
 
 interface BingoCardsProps {
   cards: Card[];
+  bingoColumns: BingoColumn[];
   previousCalls: string[];
   winningCard: number | null;
 }
 
 export default function BingoCards({
   cards,
+  bingoColumns,
   previousCalls,
   winningCard,
 }: BingoCardsProps) {
@@ -23,6 +25,7 @@ export default function BingoCards({
             card={card}
             key={cardIndex}
             cardKey={cardIndex}
+            bingoColumns={bingoColumns}
             previousCalls={previousCalls}
             winningCard={winningCard}
           />
