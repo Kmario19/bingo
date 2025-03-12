@@ -1,8 +1,9 @@
 'use client';
 
-import { Link, ArrowLeft, Play, Pause, VolumeX, Volume2 } from 'lucide-react';
+import { ArrowLeft, Play, Pause, VolumeX, Volume2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Game } from '@/types/game';
+import Link from 'next/link';
 
 interface GameHeaderProps {
   game: Game;
