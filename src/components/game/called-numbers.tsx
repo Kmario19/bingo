@@ -27,7 +27,7 @@ export default function CalledNumbers({
                 {calledNumbersByColumn[column.letter].map((number) => (
                   <div
                     key={`${column.letter}-${number}`}
-                    className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium text-center"
+                    className="bg-primary/10 text-primary rounded-md px-2 py-1 text-sm font-medium text-center"
                   >
                     {number}
                   </div>

@@ -14,7 +14,7 @@ export default function PreviousCalls({ previousCalls }: PreviousCallsProps) {
         {previousCalls.slice(0, 15).map((call, index) => (
           <div
             key={index}
-            className="bg-primary/10 text-primary-foreground rounded-md px-2 py-1 text-sm font-medium"
+            className="bg-primary/10 text-primary rounded-md px-2 py-1 text-sm font-medium"
           >
             {call}
           </div>

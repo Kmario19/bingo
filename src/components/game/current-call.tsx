@@ -17,7 +17,7 @@ export default function CurrentCall({
 }: CurrentCallProps) {
   return (
     <div className="bg-card rounded-2xl shadow-xl p-8 mb-8 text-center relative overflow-hidden">
-      <div className="absolute top-4 right-4 bg-primary/20 text-primary-foreground rounded-full px-3 py-1 text-sm font-medium">
+      <div className="absolute top-4 right-4 bg-primary/20 text-primary rounded-full px-3 py-1 text-sm font-medium">
         {isPaused ? (
           <span className="flex items-center gap-1">
             <Pause className="h-3 w-3" /> Game Paused
