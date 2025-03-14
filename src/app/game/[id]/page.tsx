@@ -298,6 +298,7 @@ export default function GamePage({ params }: GamePageProps) {
             countdown={countdown}
             isPaused={isPaused}
             winningCard={winningCard}
+            game={game}
           />
 
           <CalledNumbers

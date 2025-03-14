@@ -1,7 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { PlusCircle, Users, Trophy, ArrowRight, Grid2x2 } from 'lucide-react';
+import {
+  PlusCircle,
+  Users,
+  Trophy,
+  ArrowRight,
+  Grid2x2,
+  Grid3x3,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +16,11 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 import type { NewGame } from '@/types/game';
 import random from '@/lib/random';
 import { redirect } from 'next/navigation';
+
+const createEmptyPattern = () =>
+  Array(5)
+    .fill(null)
+    .map(() => Array(5).fill(false));
 
 export default function Home() {
   const [gameName, setGameName] = useState('');
@@ -23,6 +35,7 @@ export default function Home() {
       id: random.generateUniqueCode(),
       title: gameName,
       maxPlayers,
+      winPattern: createEmptyPattern(),
     };
 
     setGame(game);
@@ -99,21 +112,29 @@ export default function Home() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="maxPlayers">Maximum Players</Label>
-              <div className="flex items-center gap-4">
-                <Input
-                  type="range"
-                  id="maxPlayers"
-                  min="2"
-                  max="45"
-                  value={maxPlayers}
-                  onChange={(e) => setMaxPlayers(Number(e.target.value))}
-                  className="flex-1 shadow-none"
-                />
-                <div className="flex items-center text-right gap-2 min-w-[45px]">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{maxPlayers}</span>
+            <div className="flex space-x-2">
+              <div className="space-y-2">
+                <Label htmlFor="maxPlayers">Maximum Players</Label>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="range"
+                    id="maxPlayers"
+                    min="2"
+                    max="45"
+                    value={maxPlayers}
+                    onChange={(e) => setMaxPlayers(Number(e.target.value))}
+                    className="flex-1 shadow-none"
+                  />
+                  <div className="flex items-center text-right gap-2 min-w-[45px]">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{maxPlayers}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="maxPlayers">Pattern target</Label>
+                <div className="text-center">
+                  <Grid3x3 className="w-8 h-8 text-primary inline-block" />
                 </div>
               </div>
             </div>
