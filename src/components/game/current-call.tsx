@@ -130,6 +130,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={!game.winPattern}
                 onClick={clearPattern}
               >
                 Clear
@@ -138,6 +139,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={!game.winPattern}
                 onClick={() => setWinPattern(presetPatterns.full)}
               >
                 Full
@@ -146,6 +148,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={!game.winPattern}
                 onClick={() => setWinPattern(presetPatterns.line)}
               >
                 Line
@@ -154,6 +157,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={!game.winPattern}
                 onClick={() => setWinPattern(presetPatterns.column)}
               >
                 Column
@@ -162,6 +166,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={!game.winPattern}
                 onClick={() => setWinPattern(presetPatterns.cross)}
               >
                 Cross
@@ -170,6 +175,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
+                disabled={!game.winPattern}
                 onClick={() => setWinPattern(presetPatterns.corners)}
               >
                 Corners
