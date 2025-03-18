@@ -135,7 +135,7 @@ export default function GamePage({ params }: GamePageProps) {
   const [cards, setCards] = useState<Card[]>([]);
   const [muted, setMuted] = useState(false);
   const [countdown, setCountdown] = useState(10);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [winningCard, setWinningCard] = useState<number | null>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -260,13 +260,14 @@ export default function GamePage({ params }: GamePageProps) {
 
   // Toggle pause/resume
   const togglePause = () => {
+    if (!game.winPattern) return;
     if (winningCard !== null) return;
     setIsPaused((prev) => !prev);
   };
 
   // Manual call generation (only when paused)
   const handleManualCall = () => {
-    if (isPaused && winningCard === null) {
+    if (isPaused && winningCard === null && game.winPattern) {
       generateNewCall();
     }
   };

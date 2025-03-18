@@ -26,7 +26,9 @@ export default function CurrentCall({
   winningCard,
   game,
 }: CurrentCallProps) {
-  const [winPattern, setWinPattern] = useState(game.winPattern!);
+  const [winPattern, setWinPattern] = useState(
+    game.winPattern || createEmptyPattern()
+  );
   const [isDrawing, setIsDrawing] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
