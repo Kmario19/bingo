@@ -5,6 +5,7 @@ export type Game = {
   dateEnd: Date;
   numberOfCards: number;
   maxPlayers: number;
+  winPattern?: Array<Array<boolean>>;
 };
 
 export type NewGame = Omit<Game, 'dateStart' | 'dateEnd' | 'numberOfCards'>;
