@@ -1,14 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  PlusCircle,
-  Users,
-  Trophy,
-  ArrowRight,
-  Grid2x2,
-  Grid3x3,
-} from 'lucide-react';
+import { PlusCircle, Users, Trophy, ArrowRight, Grid2x2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,9 +20,12 @@ export default function Home() {
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [gameCode, setGameCode] = useState('');
   const [, setGame] = useLocalStorage<NewGame | null>('game', null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateGame = (e: React.FormEvent) => {
     e.preventDefault();
+
+    setIsLoading(true);
 
     const game = {
       id: random.generateUniqueCode(),
@@ -132,10 +128,36 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <Button type="submit" className="w-full">
-              Create Game
-              <PlusCircle className="ml-2 h-4 w-4" />
-            </Button>
+            {isLoading ? (
+              <Button type="button" className="w-full" disabled>
+                Creating Game...
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+              </Button>
+            ) : (
+              <Button type="submit" className="w-full">
+                Create Game
+                <PlusCircle className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </form>
         </div>
       </div>
