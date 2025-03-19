@@ -112,7 +112,7 @@ export default function Home() {
                 required
               />
             </div>
-            <div className="flex space-x-2">
+            <div>
               <div className="space-y-2">
                 <Label htmlFor="maxPlayers">Maximum Players</Label>
                 <div className="flex items-center gap-4">
@@ -129,12 +129,6 @@ export default function Home() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">{maxPlayers}</span>
                   </div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="maxPlayers">Pattern target</Label>
-                <div className="text-center">
-                  <Grid3x3 className="w-8 h-8 text-primary inline-block" />
                 </div>
               </div>
             </div>
