@@ -302,13 +302,6 @@ export default function GamePage({ params }: GamePageProps) {
             game={game}
           />
 
-          <CalledNumbers
-            bingoColumns={BINGO_COLUMNS}
-            calledNumbersByColumn={calledNumbersByColumn}
-          />
-
-          <PreviousCalls previousCalls={previousCalls} />
-
           <GameControls
             isPaused={isPaused}
             togglePause={togglePause}
@@ -317,6 +310,13 @@ export default function GamePage({ params }: GamePageProps) {
             handleManualCall={handleManualCall}
             winningCard={winningCard}
           />
+
+          <CalledNumbers
+            bingoColumns={BINGO_COLUMNS}
+            calledNumbersByColumn={calledNumbersByColumn}
+          />
+
+          <PreviousCalls previousCalls={previousCalls} />
 
           <BingoCards
             cards={cards}
