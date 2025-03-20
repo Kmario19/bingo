@@ -112,6 +112,11 @@ const checkForWin = (card: Card, previousCalls: string[]) => {
   return diagonal1Complete || diagonal2Complete;
 };
 
+const createEmptyPattern = () =>
+  Array(5)
+    .fill(null)
+    .map(() => Array(5).fill(false));
+
 interface GamePageProps {
   params: Promise<{ id: string }>;
 }
@@ -144,6 +149,9 @@ export default function GamePage({ params }: GamePageProps) {
     title: 'Bingo',
     maxPlayers: 0,
   } as Game);
+  const [winPattern, setWinPattern] = useState(
+    game.winPattern || createEmptyPattern()
+  );
 
   const { id } = use(params);
 
@@ -167,6 +175,12 @@ export default function GamePage({ params }: GamePageProps) {
       .map(() => generateBingoCard());
     setCards(newCards);
   }, [game]);
+
+  useEffect(() => {
+    if (game.winPattern !== winPattern) {
+      game.winPattern = winPattern;
+    }
+  }, [winPattern, game]);
 
   // Generate a new call
   const generateNewCall = useCallback(() => {
@@ -300,6 +314,8 @@ export default function GamePage({ params }: GamePageProps) {
             isPaused={isPaused}
             winningCard={winningCard}
             game={game}
+            winPattern={winPattern}
+            setWinPattern={setWinPattern}
           />
 
           <GameControls

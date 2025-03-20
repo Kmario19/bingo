@@ -11,6 +11,10 @@ interface CurrentCallProps {
   isPaused: boolean;
   winningCard: number | null;
   game: Game;
+  winPattern: boolean[][];
+  setWinPattern: (
+    pattern: boolean[][] | ((prev: boolean[][]) => boolean[][])
+  ) => void;
 }
 
 // Create an empty 5x5 pattern
@@ -25,10 +29,9 @@ export default function CurrentCall({
   isPaused,
   winningCard,
   game,
+  winPattern,
+  setWinPattern,
 }: CurrentCallProps) {
-  const [winPattern, setWinPattern] = useState(
-    game.winPattern || createEmptyPattern()
-  );
   const [isDrawing, setIsDrawing] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
