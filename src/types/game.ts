@@ -1,3 +1,10 @@
+export enum GameStatus {
+  Open = 'open',
+  Closed = 'closed',
+  InProgress = 'in-progress',
+  Finished = 'finished',
+}
+
 export type Game = {
   id: string;
   title: string;
@@ -6,6 +13,7 @@ export type Game = {
   numberOfCards: number;
   maxPlayers: number;
   winPattern?: Array<Array<boolean>>;
+  status: GameStatus;
 };
 
 export type NewGame = Omit<Game, 'dateStart' | 'dateEnd' | 'numberOfCards'>;
