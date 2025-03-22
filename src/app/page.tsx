@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import type { NewGame } from '@/types/game';
+import { GameStatus, type NewGame } from '@/types/game';
 import random from '@/lib/random';
 import { redirect } from 'next/navigation';
 
@@ -32,6 +32,7 @@ export default function Home() {
       title: gameName,
       maxPlayers,
       winPattern: createEmptyPattern(),
+      status: GameStatus.Open,
     };
 
     setGame(game);
