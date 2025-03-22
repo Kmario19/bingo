@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Game } from '@/types/game';
+import { Game, GameStatus } from '@/types/game';
 import { Pause, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -186,30 +186,37 @@ export default function CurrentCall({
             </div>
           </div>
         </div>
+        {game.status === GameStatus.Open ? (
+          <div>
+            <Button className="rounded-full p-20 w-20 drop-shadow-lg">
+              Start Game
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <h2 className="text-xl font-semibold text-card-foreground mb-4">
+              Current Call
+            </h2>
 
-        <div>
-          <h2 className="text-xl font-semibold text-card-foreground mb-4">
-            Current Call
-          </h2>
-
-          {currentCall ? (
-            <div className="flex flex-col items-center justify-center animate-fade-in">
-              <div className="text-8xl font-bold text-primary mb-2 flex items-center">
-                <span>{currentCall.letter}</span>
-                <span>{currentCall.number}</span>
+            {currentCall ? (
+              <div className="flex flex-col items-center justify-center animate-fade-in">
+                <div className="text-8xl font-bold text-primary mb-2 flex items-center">
+                  <span>{currentCall.letter}</span>
+                  <span>{currentCall.number}</span>
+                </div>
+                <p className="text-xl text-card-foreground/70">
+                  {currentCall.letter} - {currentCall.number}
+                </p>
               </div>
-              <p className="text-xl text-card-foreground/70">
-                {currentCall.letter} - {currentCall.number}
-              </p>
-            </div>
-          ) : (
-            <div className="h-40 flex items-center justify-center">
-              <p className="text-xl text-card-foreground/70">
-                Waiting for first call...
-              </p>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="h-40 flex items-center justify-center">
+                <p className="text-xl text-card-foreground/70">
+                  Waiting for first call...
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
