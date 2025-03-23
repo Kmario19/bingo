@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Game, GameStatus } from '@/types/game';
 import { Pause, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import useLocalStorage from '@/hooks/useLocalStorage';
 
 interface CurrentCallProps {
   currentCall: { letter: string; number: number; full: string } | null;
@@ -34,6 +35,7 @@ export default function CurrentCall({
 }: CurrentCallProps) {
   const [isDrawing, setIsDrawing] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [, setGame] = useLocalStorage<Game>('game', game);
 
   const toggleCell = (rowIndex: number, colIndex: number) => {
     setWinPattern((prev) => {
@@ -82,7 +84,12 @@ export default function CurrentCall({
   };
 
   const startGame = () => {
-    // Start
+    if (!winPattern.flat().some((cell) => cell)) {
+      alert('Please select a winning pattern before starting the game.');
+      return;
+    }
+    game.status = GameStatus.InProgress;
+    setGame((prev) => ({ ...prev, status: GameStatus.InProgress }));
   };
 
   return (
