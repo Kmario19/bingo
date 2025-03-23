@@ -81,6 +81,10 @@ export default function CurrentCall({
     ),
   };
 
+  const startGame = () => {
+    // Start
+  };
+
   return (
     <div className="bg-card rounded-2xl shadow-xl p-8 mb-8 text-center relative overflow-hidden">
       <div className="absolute top-4 right-4 bg-primary/20 text-primary rounded-full px-3 py-1 text-sm font-medium">
@@ -188,7 +192,10 @@ export default function CurrentCall({
         </div>
         {game.status === GameStatus.Open ? (
           <div>
-            <Button className="rounded-full p-20 w-20 drop-shadow-lg">
+            <Button
+              className="rounded-full p-20 w-20 drop-shadow-lg"
+              onClick={startGame}
+            >
               Start Game
             </Button>
           </div>
