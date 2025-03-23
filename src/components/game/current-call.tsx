@@ -88,8 +88,11 @@ export default function CurrentCall({
       alert('Please select a winning pattern before starting the game.');
       return;
     }
+
+    game.winPattern = winPattern;
     game.status = GameStatus.InProgress;
-    setGame((prev) => ({ ...prev, status: GameStatus.InProgress }));
+
+    setGame(game);
   };
 
   return (
