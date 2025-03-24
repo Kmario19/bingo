@@ -10,6 +10,7 @@ interface CurrentCallProps {
   currentCall: { letter: string; number: number; full: string } | null;
   countdown: number;
   isPaused: boolean;
+  togglePause: () => void;
   winningCard: number | null;
   game: Game;
   winPattern: boolean[][];
@@ -28,6 +29,7 @@ export default function CurrentCall({
   currentCall,
   countdown,
   isPaused,
+  togglePause,
   winningCard,
   game,
   winPattern,
@@ -93,6 +95,8 @@ export default function CurrentCall({
     game.status = GameStatus.InProgress;
 
     setGame(game);
+
+    togglePause();
   };
 
   return (

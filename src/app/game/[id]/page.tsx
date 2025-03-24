@@ -312,6 +312,7 @@ export default function GamePage({ params }: GamePageProps) {
             currentCall={currentCall}
             countdown={countdown}
             isPaused={isPaused}
+            togglePause={togglePause}
             winningCard={winningCard}
             game={game}
             winPattern={winPattern}
