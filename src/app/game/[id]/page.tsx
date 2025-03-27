@@ -1,7 +1,7 @@
 'use client';
 
 import Header from '@/components/header';
-import useLocalStorage from '@/hooks/useLocalStorage';
+import useIndexDB from '@/hooks/useIndexDB';
 import { Game, BingoColumn, Card } from '@/types/game';
 import { redirect } from 'next/navigation';
 
@@ -145,21 +145,19 @@ export default function GamePage({ params }: GamePageProps) {
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isGeneratingCall = useRef(false);
-  const [game] = useLocalStorage<Game>('game', {
-    title: 'Bingo',
-    maxPlayers: 0,
-  } as Game);
+  const [game] = useIndexDB<Game | null>('game', null);
   const [winPattern, setWinPattern] = useState(
-    game.winPattern || createEmptyPattern()
+    game?.winPattern || createEmptyPattern()
   );
 
   const { id } = use(params);
 
   useEffect(() => {
-    if (!game || game.id !== id) {
+    if (game?.maxPlayers > 0 && game?.id !== id) {
+      console.log('Mismatched game ID, redirecting to home');
       redirect('/');
     }
-  }, [game, id]);
+  }, [game?.maxPlayers, game?.id, id]);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -170,17 +168,17 @@ export default function GamePage({ params }: GamePageProps) {
     }
 
     // Generate initial cards
-    const newCards = Array(game.maxPlayers)
+    const newCards = Array(game?.maxPlayers)
       .fill(0)
       .map(() => generateBingoCard());
     setCards(newCards);
-  }, [game]);
+  }, [game?.maxPlayers]);
 
   useEffect(() => {
-    if (game.winPattern !== winPattern) {
+    if (game && game.winPattern !== winPattern) {
       game.winPattern = winPattern;
     }
-  }, [winPattern, game]);
+  }, [game, winPattern]);
 
   // Generate a new call
   const generateNewCall = useCallback(() => {
@@ -196,6 +194,7 @@ export default function GamePage({ params }: GamePageProps) {
 
       // Ensure we don't repeat a call
       while (calledNumbersByColumn[newCall.letter].includes(newCall.number)) {
+        console.log('Duplicate call:');
         newCall = getRandomBingoCall();
       }
 
@@ -274,14 +273,14 @@ export default function GamePage({ params }: GamePageProps) {
 
   // Toggle pause/resume
   const togglePause = () => {
-    if (!game.winPattern) return;
+    if (!game?.winPattern) return;
     if (winningCard !== null) return;
     setIsPaused((prev) => !prev);
   };
 
   // Manual call generation (only when paused)
   const handleManualCall = () => {
-    if (isPaused && winningCard === null && game.winPattern) {
+    if (isPaused && winningCard === null && game?.winPattern) {
       generateNewCall();
     }
   };
