@@ -317,6 +317,7 @@ export default function GamePage({ params }: GamePageProps) {
             game={game}
             winPattern={winPattern}
             setWinPattern={setWinPattern}
+            setCountdown={setCountdown}
           />
 
           <GameControls

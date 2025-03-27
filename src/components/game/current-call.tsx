@@ -17,6 +17,7 @@ interface CurrentCallProps {
   setWinPattern: (
     pattern: boolean[][] | ((prev: boolean[][]) => boolean[][])
   ) => void;
+  setCountdown: (countdown: number) => void;
 }
 
 // Create an empty 5x5 pattern
@@ -34,6 +35,7 @@ export default function CurrentCall({
   game,
   winPattern,
   setWinPattern,
+  setCountdown,
 }: CurrentCallProps) {
   const [isDrawing, setIsDrawing] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -95,6 +97,8 @@ export default function CurrentCall({
     game.status = GameStatus.InProgress;
 
     setGame(game);
+
+    setCountdown(1);
 
     togglePause();
   };
