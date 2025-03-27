@@ -12,7 +12,7 @@ interface CurrentCallProps {
   isPaused: boolean;
   togglePause: () => void;
   winningCard: number | null;
-  game: Game;
+  game: Game | null;
   winPattern: boolean[][];
   setWinPattern: (
     pattern: boolean[][] | ((prev: boolean[][]) => boolean[][])
@@ -39,7 +39,7 @@ export default function CurrentCall({
 }: CurrentCallProps) {
   const [isDrawing, setIsDrawing] = useState<boolean | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [, setGame] = useLocalStorage<Game>('game', game);
+  const [, setGame] = useLocalStorage<Game | null>('game', game);
 
   const toggleCell = (rowIndex: number, colIndex: number) => {
     setWinPattern((prev) => {
@@ -92,6 +92,8 @@ export default function CurrentCall({
       alert('Please select a winning pattern before starting the game.');
       return;
     }
+
+    if (!game) return;
 
     game.winPattern = winPattern;
     game.status = GameStatus.InProgress;
@@ -155,7 +157,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!game.winPattern}
+                disabled={!game?.winPattern}
                 onClick={clearPattern}
               >
                 Clear
@@ -164,7 +166,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!game.winPattern}
+                disabled={!game?.winPattern}
                 onClick={() => setWinPattern(presetPatterns.full)}
               >
                 Full
@@ -173,7 +175,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!game.winPattern}
+                disabled={!game?.winPattern}
                 onClick={() => setWinPattern(presetPatterns.line)}
               >
                 Line
@@ -182,7 +184,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!game.winPattern}
+                disabled={!game?.winPattern}
                 onClick={() => setWinPattern(presetPatterns.column)}
               >
                 Column
@@ -191,7 +193,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!game.winPattern}
+                disabled={!game?.winPattern}
                 onClick={() => setWinPattern(presetPatterns.cross)}
               >
                 Cross
@@ -200,7 +202,7 @@ export default function CurrentCall({
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!game.winPattern}
+                disabled={!game?.winPattern}
                 onClick={() => setWinPattern(presetPatterns.corners)}
               >
                 Corners
@@ -208,7 +210,7 @@ export default function CurrentCall({
             </div>
           </div>
         </div>
-        {game.status === GameStatus.Open ? (
+        {game?.status === GameStatus.Open ? (
           <div>
             <Button
               className="rounded-full p-20 w-20 drop-shadow-lg"
