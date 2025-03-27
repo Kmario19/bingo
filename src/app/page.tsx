@@ -5,7 +5,7 @@ import { PlusCircle, Users, Trophy, ArrowRight, Grid2x2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import useLocalStorage from '@/hooks/useLocalStorage';
+import useIndexDB from '@/hooks/useIndexDB';
 import { GameStatus, type NewGame } from '@/types/game';
 import random from '@/lib/random';
 import { redirect } from 'next/navigation';
@@ -19,7 +19,7 @@ export default function Home() {
   const [gameName, setGameName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(4);
   const [gameCode, setGameCode] = useState('');
-  const [, setGame] = useLocalStorage<NewGame | null>('game', null);
+  const [, setGame] = useIndexDB<NewGame | null>('game', null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateGame = (e: React.FormEvent) => {
