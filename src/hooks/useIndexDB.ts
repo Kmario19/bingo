@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 function useIndexedDB<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(initialValue);
   const DB_NAME = 'bingoApp';
-  const STORE_NAME = 'bingoStore';
+  const STORE_NAME = 'games';
 
   const initDB = async () => {
     return new Promise<IDBDatabase>((resolve, reject) => {
