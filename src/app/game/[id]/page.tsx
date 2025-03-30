@@ -153,7 +153,7 @@ export default function GamePage({ params }: GamePageProps) {
   const { id } = use(params);
 
   useEffect(() => {
-    if (game?.maxPlayers > 0 && game?.id !== id) {
+    if ((game?.maxPlayers ?? 0) > 0 && game?.id !== id) {
       console.log('Mismatched game ID, redirecting to home');
       redirect('/');
     }
